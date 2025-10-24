@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | My Mini Store</title>
+
+  <!-- ✅ Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ✅ Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .navbar-brand { font-weight: 600; color: #007bff !important; }
+    .nav-link { color: #555 !important; font-weight: 500; }
+    .nav-link:hover { color: #007bff !important; }
+    h2 {
+      font-weight: 600;
+      margin-top: 20px;
+    }
+    .order-card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+      background: #fff;
+    }
+    footer {
+      background: #ffffff;
+      color: #777;
+      padding: 15px 0;
+      text-align: center;
+      border-top: 1px solid #eee;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">🛍️ My Mini Store</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="cart.html">Cart</a></li>
+          <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
+          <li class="nav-item"><a class="nav-link active" href="admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ✅ Orders Section -->
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">📦 Customer Orders</h2>
+    <div id="ordersList"></div>
+  </div>
+
+  <!-- ✅ Footer -->
+  <footer>
+    <p>© 2025 My Mini Store. All Rights Reserved.</p>
+  </footer>
+
+  <!-- ✅ Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAK2MAer8SnP8NZqmE27rDMg3n2qBn7EyQ",
+      authDomain: "my-mini-store-ef57a.firebaseapp.com",
+      databaseURL: "https://my-mini-store-ef57a-default-rtdb.firebaseio.com",
+      projectId: "my-mini-store-ef57a",
+      storageBucket: "my-mini-store-ef57a.firebasestorage.app",
+      messagingSenderId: "295106847721",
+      appId: "1:295106847721:web:5ba2d342c3a994543f2178",
+      measurementId: "G-DNDN4WRE5Y"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const ordersRef = ref(db, "orders");
+    const ordersList = document.getElementById("ordersList");
+
+    onValue(ordersRef, (snapshot) => {
+      ordersList.innerHTML = "";
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        Object.keys(data).reverse().forEach((orderId) => {
+          const order = data[orderId];
+          const productsHTML = order.cart.map(p => `
+            <li>${p.name} - $${p.price}</li>
+          `).join("");
+
+          const card = `
+            <div class="order-card">
+              <h5><strong>Customer:</strong> ${order.name}</h5>
+              <p><strong>Email:</strong> ${order.email}</p>
+              <p><strong>Address:</strong> ${order.address}</p>
+              <p><strong>Date:</strong> ${order.date || "N/A"}</p>
+              <strong>Products:</strong>
+              <ul>${productsHTML}</ul>
+            </div>`;
+          ordersList.innerHTML += card;
+        });
+      } else {
+        ordersList.innerHTML = "<p class='text-center text-muted'>No orders yet.</p>";
+      }
+    });
+  </script>
+</body>
+</html>
