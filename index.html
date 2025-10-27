@@ -126,56 +126,45 @@
     <p>© 2025 My Mini Store. All rights reserved.</p>
   </footer>
 
-  <!-- ✅ Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAK2MAer8SnP8NZqmE27rDMg3n2qBn7EyQ",
-      authDomain: "my-mini-store-ef57a.firebaseapp.com",
-      databaseURL: "https://my-mini-store-ef57a-default-rtdb.firebaseio.com",
-      projectId: "my-mini-store-ef57a",
-      storageBucket: "my-mini-store-ef57a.firebasestorage.app",
-      messagingSenderId: "295106847721",
-      appId: "1:295106847721:web:5ba2d342c3a994543f2178",
-      measurementId: "G-DNDN4WRE5Y"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  <!-- ✅ Product Display Script -->
+  <script>
+    const sampleProducts = [
+      {
+        id: "1",
+        name: "Braun Beard Trimmer",
+        price: 39.99,
+        image: "https://m.media-amazon.com/images/I/61B-ZeYZ4wL._AC_SL1500_.jpg"
+      },
+      {
+        id: "2",
+        name: "Philips Electric Shaver",
+        price: 59.99,
+        image: "https://m.media-amazon.com/images/I/71MXP9W1xBL._AC_SL1500_.jpg"
+      },
+      {
+        id: "3",
+        name: "Panasonic Hair Clipper",
+        price: 42.50,
+        image: "https://m.media-amazon.com/images/I/61hGJ1aW8GL._AC_SL1500_.jpg"
+      }
+    ];
 
     const productList = document.getElementById("product-list");
-    const productsRef = ref(db, "products");
+    productList.innerHTML = sampleProducts.map(p => `
+      <div class="col-md-4 mb-4">
+        <div class="card product-card p-3">
+          <img src="${p.image}" class="card-img-top" alt="${p.name}">
+          <div class="card-body text-center">
+            <h5 class="card-title">${p.name}</h5>
+            <p class="card-text text-muted fw-bold">$${p.price}</p>
+            <button class="btn btn-primary" onclick="addToCart('${p.id}', '${p.name}', '${p.price}', '${p.image}')">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
 
-    onValue(productsRef, (snapshot) => {
-      productList.innerHTML = "";
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        Object.keys(data).forEach((id) => {
-          const p = data[id];
-          const card = `
-            <div class="col-md-4 mb-4">
-              <div class="card product-card p-3">
-                <img src="${p.image}" class="card-img-top" alt="${p.name}">
-                <div class="card-body text-center">
-                  <h5 class="card-title">${p.name}</h5>
-                  <p class="card-text text-muted fw-bold">$${p.price}</p>
-                  <button class="btn btn-primary" onclick="addToCart('${id}', '${p.name}', '${p.price}', '${p.image}')">
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            </div>`;
-          productList.innerHTML += card;
-        });
-      } else {
-        productList.innerHTML = "<p class='text-center text-muted'>No products available at the moment.</p>";
-      }
-    });
-  </script>
-
-  <script>
     function addToCart(id, name, price, image) {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
       cart.push({ id, name, price, image });
@@ -184,5 +173,9 @@
       window.location.href = "cart.html";
     }
   </script>
+
 </body>
 </html>
+
+
+
